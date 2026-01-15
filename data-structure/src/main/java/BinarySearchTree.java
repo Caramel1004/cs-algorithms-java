@@ -1,5 +1,5 @@
 import java.util.Comparator;
-import java.util.NoSuchElementException;
+import java.util.Stack;
 
 public class BinarySearchTree<E> {
     private class Node<E> {
@@ -70,18 +70,19 @@ public class BinarySearchTree<E> {
         if (currentNode == null) {
             return null;
         }
-        if(currentNode.leftChildNode == null && currentNode.rightChildNode == null ){
-
+        if (currentNode.leftChildNode == null && currentNode.rightChildNode == null) {
             this.root = null;
-            return element;
+            return currentNode.element;
         }
         // 후계자 탐색 (오른쪽 노드의 서브트리 안에서 가장 작은 노드 탐색)
         while (true) {
             int compValue = comp.compare(element, currentNode.element);
             if (compValue == 0) { // 일치하는 노드 탐색 성공인경우 트리 재구성이 필요함
-                rebuild(currentNode, comp);
-                return currentNode.element;
+                E removedElement = currentNode.element;
+                rebuild(currentNode);
+                return removedElement;
             }
+            // 엣지 타고 내려가기
             if (compValue < 0) {
                 if (currentNode.leftChildNode == null) {
                     return null;
@@ -96,23 +97,37 @@ public class BinarySearchTree<E> {
         }
     }
 
-    private void rebuild(Node<E> parentNode, Comparator<? super E> comp) {
-        if(parentNode.rightChildNode != null) {
-            Node<E> predecessor = findPredecessor(parentNode.rightChildNode, comp);
+    private void rebuild(Node<E> parentNode) {
+        if (parentNode.rightChildNode != null) {
+            Node<E> currentNode = parentNode.rightChildNode; // 오른쪽 노드
+            if (currentNode.leftChildNode != null) {
+                Stack<Node<E>> stack = new Stack<>();
+                do {
+                    stack.push(currentNode);
+                    currentNode = currentNode.leftChildNode;
+                } while (currentNode.leftChildNode != null);
+                if (!stack.isEmpty()) {
+                    stack.peek().leftChildNode = null;
+                }
+            }
+            parentNode.element = currentNode.element;
+            return;
         }
-        if(parentNode.leftChildNode != null) {
-            Node<E> successor = findSuccessor(parentNode.leftChildNode, comp);
+        if (parentNode.leftChildNode != null) {
+            Node<E> currentNode = parentNode.leftChildNode;
+            if (currentNode.rightChildNode != null) {
+                Stack<Node<E>> stack = new Stack<>();
+                do {
+                    stack.push(currentNode);
+                    currentNode = currentNode.rightChildNode;
+                } while (currentNode.rightChildNode != null);
+                if(!stack.isEmpty()) {
+                    stack.peek().rightChildNode = null;
+                }
+            }
+            parentNode.element = currentNode.element;
         }
     }
-
-    private Node<E> findPredecessor(Node<E> parentNode, Comparator<? super E> comp) {
-        return null;
-    }
-
-    private Node<E> findSuccessor(Node<E> parentNode, Comparator<? super E> comp) {
-        return null;
-    }
-
 
     /**
      * 평균: O(log N)
@@ -145,6 +160,4 @@ public class BinarySearchTree<E> {
             }
         }
     }
-
-
 }
