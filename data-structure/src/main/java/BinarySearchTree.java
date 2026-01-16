@@ -67,19 +67,21 @@ public class BinarySearchTree<E> {
      */
     public E remove(E element, Comparator<? super E> comp) {
         Node<E> currentNode = this.root;
+        Node<E> currentParentNode = currentNode;
         if (currentNode == null) {
             return null;
         }
-        if (currentNode.leftChildNode == null && currentNode.rightChildNode == null) {
+        if ((currentNode.leftChildNode == null && currentNode.rightChildNode == null) && comp.compare(element, currentNode.element) == 0) {
             this.root = null;
             return currentNode.element;
         }
         // 후계자 탐색 (오른쪽 노드의 서브트리 안에서 가장 작은 노드 탐색)
+        boolean isLeftNode = true;
         while (true) {
             int compValue = comp.compare(element, currentNode.element);
             if (compValue == 0) { // 일치하는 노드 탐색 성공인경우 트리 재구성이 필요함
                 E removedElement = currentNode.element;
-                rebuild(currentNode);
+                rebuild(currentParentNode, currentNode, isLeftNode); // 여기서 currentNode는 삭제할 노드
                 return removedElement;
             }
             // 엣지 타고 내려가기
@@ -87,45 +89,57 @@ public class BinarySearchTree<E> {
                 if (currentNode.leftChildNode == null) {
                     return null;
                 }
+                currentParentNode = currentNode;
                 currentNode = currentNode.leftChildNode;
+                isLeftNode = true;
             } else {
                 if (currentNode.rightChildNode == null) {
                     return null;
                 }
+                currentParentNode = currentNode;
                 currentNode = currentNode.rightChildNode;
+                isLeftNode = false;
             }
         }
     }
 
-    private void rebuild(Node<E> parentNode) {
-        if (parentNode.rightChildNode != null) {
-            Node<E> currentNode = parentNode.rightChildNode; // 오른쪽 노드
+    private void rebuild(Node<E> parentNode, Node<E> childNode, boolean isLeftNode) {
+        Node<E> currentParentNode = childNode;
+        if (childNode.rightChildNode != null) {
+            Node<E> currentNode = childNode.rightChildNode; // 오른쪽 노드
             if (currentNode.leftChildNode != null) {
-                Stack<Node<E>> stack = new Stack<>();
-                do {
-                    stack.push(currentNode);
+                while (true) { // 마지막에는 리프까지 도달하므로 왼쪽 자식 노드가 존재하지 않을때까지 반복문을 끝내지 않습니다.
+                    if (currentNode.leftChildNode == null) {
+                        break;
+                    }
+                    currentParentNode = currentNode;
                     currentNode = currentNode.leftChildNode;
-                } while (currentNode.leftChildNode != null);
-                if (!stack.isEmpty()) {
-                    stack.peek().leftChildNode = null;
                 }
+                currentParentNode.leftChildNode = currentNode.rightChildNode;
+
             }
-            parentNode.element = currentNode.element;
+            childNode.element = currentNode.element;
             return;
         }
-        if (parentNode.leftChildNode != null) {
-            Node<E> currentNode = parentNode.leftChildNode;
+        if (childNode.leftChildNode != null) {
+            Node<E> currentNode = childNode.leftChildNode;
             if (currentNode.rightChildNode != null) {
-                Stack<Node<E>> stack = new Stack<>();
-                do {
-                    stack.push(currentNode);
+                while (true) {
+                    if (currentNode.rightChildNode == null) {
+                        break;
+                    }
+                    currentParentNode = currentNode;
                     currentNode = currentNode.rightChildNode;
-                } while (currentNode.rightChildNode != null);
-                if(!stack.isEmpty()) {
-                    stack.peek().rightChildNode = null;
                 }
+                currentParentNode.rightChildNode = currentNode.leftChildNode;
             }
-            parentNode.element = currentNode.element;
+            childNode.element = currentNode.element;
+            return;
+        }
+        if (isLeftNode) {
+            parentNode.leftChildNode = null;
+        } else {
+            parentNode.rightChildNode = null;
         }
     }
 
