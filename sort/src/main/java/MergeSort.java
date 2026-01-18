@@ -1,36 +1,36 @@
 public class MergeSort {
-        private static int[] temp;
     public static void main(String[] args) {
         int[] arr = {3, 44, 5, 38, 47, 15, 36, 26};
-        temp =  new int[arr.length];
-
         mergeSort(arr, 0, arr.length - 1);
-
-        temp = null;
     }
 
 
     // 병합 정렬
     private static void mergeSort(int[] arr, int firstIndex, int lastIndex) {
+        // 마지막 배열 크기 1일인 경우 if문 패스
         if (firstIndex < lastIndex) {
-            int pl = firstIndex;
-            int pr = lastIndex;
-            int pmid = (pl + pr) / 2;
+            int middleIndex = (firstIndex + lastIndex) / 2;
 
             // 제일 작은 단위까지 분할되도록 재귀 호출
-            mergeSort(arr, pl, pmid);
-            mergeSort(arr, pmid, pr);
+            mergeSort(arr, firstIndex, middleIndex);
+            mergeSort(arr, middleIndex + 1, lastIndex);
 
-            // arr[pl] ~ arr[pmid]: 배열 앞부분
-            // 배열 앞부분을 temp[pl] ~ temp[pmid]까지 저장
-            for(int i = firstIndex; i <= pmid; i++){
-                temp[pl++] = arr[i];
+            int[] mergedArr = new int[lastIndex - firstIndex + 1];
+            int leftPointer = firstIndex; // 중앙 인덱스 왼쪽 구간의 시작 포인터
+            int rightPointer = middleIndex + 1; // 중앙 인덱스 오른쪽 구간의 시작 포인터
+
+
+            while (leftPointer <= middleIndex && rightPointer <= lastIndex) {
+
             }
 
-            // arr[pmid + 1] ~ arr[pr]과 temp[pl] ~ temp[pmid] 비교
+            while (leftPointer <= middleIndex) {
 
+            }
 
-            // 배열 temp에 남은 요소를 배열 arr 요소로 저장
+            while (rightPointer <= lastIndex) {
+
+            }
         }
     }
 }
