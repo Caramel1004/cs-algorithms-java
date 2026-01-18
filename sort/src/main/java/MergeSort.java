@@ -19,18 +19,24 @@ public class MergeSort {
             int leftPointer = firstIndex; // 중앙 인덱스 왼쪽 구간의 시작 포인터
             int rightPointer = middleIndex + 1; // 중앙 인덱스 오른쪽 구간의 시작 포인터
 
-
+            int i = 0;
+            // 두 포인터 중 경계 인덱스 넘어가면 반복문 종료
             while (leftPointer <= middleIndex && rightPointer <= lastIndex) {
-
+                mergedArr[i++] = arr[leftPointer] < arr[rightPointer] ? arr[leftPointer++] : arr[rightPointer++];
             }
 
+            // 남은 왼쪽 요소들 복사
             while (leftPointer <= middleIndex) {
-
+                mergedArr[i++] = arr[leftPointer++];
             }
 
+            // 남은 오른쪽 요소를 복사
             while (rightPointer <= lastIndex) {
-
+                mergedArr[i++] = arr[rightPointer++];
             }
+
+            // 배열 카피
+            System.arraycopy(mergedArr, 0, arr, firstIndex, mergedArr.length);
         }
     }
 }
