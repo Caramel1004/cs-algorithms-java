@@ -1,5 +1,4 @@
 import java.util.Comparator;
-import java.util.Stack;
 
 public class BinarySearchTree<E> {
     private class Node<E> {
@@ -71,10 +70,6 @@ public class BinarySearchTree<E> {
         if (currentNode == null) {
             return null;
         }
-        if ((currentNode.leftChildNode == null && currentNode.rightChildNode == null) && comp.compare(element, currentNode.element) == 0) {
-            this.root = null;
-            return currentNode.element;
-        }
         // 후계자 탐색 (오른쪽 노드의 서브트리 안에서 가장 작은 노드 탐색)
         boolean isLeftNode = true;
         while (true) {
@@ -105,6 +100,7 @@ public class BinarySearchTree<E> {
 
     private void rebuild(Node<E> parentNode, Node<E> childNode, boolean isLeftNode) {
         Node<E> currentParentNode = childNode;
+        // 자식 노드에 자손이 있는 경우
         if (childNode.rightChildNode != null) {
             Node<E> currentNode = childNode.rightChildNode; // 오른쪽 노드
             if (currentNode.leftChildNode != null) {
@@ -116,7 +112,8 @@ public class BinarySearchTree<E> {
                     currentNode = currentNode.leftChildNode;
                 }
                 currentParentNode.leftChildNode = currentNode.rightChildNode;
-
+            } else {
+                parentNode.rightChildNode = currentNode.rightChildNode;
             }
             childNode.element = currentNode.element;
             return;
@@ -132,8 +129,15 @@ public class BinarySearchTree<E> {
                     currentNode = currentNode.rightChildNode;
                 }
                 currentParentNode.rightChildNode = currentNode.leftChildNode;
+            } else {
+                parentNode.leftChildNode = currentNode.leftChildNode;
             }
             childNode.element = currentNode.element;
+            return;
+        }
+        // 자식 노드가 자손이 존재하지 않는 경우
+        if(parentNode == childNode) {
+            this.root = null;
             return;
         }
         if (isLeftNode) {
